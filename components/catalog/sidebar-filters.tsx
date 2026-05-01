@@ -12,6 +12,35 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { type FiltersResponse } from '@/lib/types'
 
+// Only show these major leagues
+const MAIN_LEAGUES = [
+  'Premier League',
+  'La Liga',
+  'LaLiga',
+  'Serie A',
+  'Bundesliga',
+  'Ligue 1',
+  'Eredivisie',
+  'Primeira Liga',
+  'Champions League',
+  'MLS',
+  'Brazilian Série A',
+  'Brazilian Serie A',
+  'Campeonato Brasileiro Série A',
+  'Argentine Primera División',
+  'Argentina Primera División',
+  'Primera División de Chile',
+  'Saudi Pro League',
+  'Super League Greece',
+  'Scottish Premiership',
+  'Belgian Pro League',
+  'Süper Lig',
+  'International',
+  'Copa America',
+  'UEFA European Championship',
+  'UEFA Nations League',
+]
+
 interface SidebarFiltersProps {
   filters: FiltersResponse
   onFilterChange?: () => void
@@ -55,9 +84,13 @@ export function SidebarFilters({ filters, onFilterChange }: SidebarFiltersProps)
   }, [router, onFilterChange])
 
   const hasActiveFilters =
-    searchParams.has('team') ||
     searchParams.has('league') ||
     searchParams.has('category')
+
+  // Filter to only show main leagues that exist in the database
+  const mainLeagues = filters.leagues.filter((league) =>
+    MAIN_LEAGUES.some((main) => main.toLowerCase() === league.toLowerCase())
+  )
 
   return (
     <div className="space-y-4">
@@ -77,35 +110,19 @@ export function SidebarFilters({ filters, onFilterChange }: SidebarFiltersProps)
 
       <Accordion
         type="multiple"
-        defaultValue={['league', 'team', 'category']}
+        defaultValue={['league', 'category']}
         className="w-full"
       >
         <AccordionItem value="league">
           <AccordionTrigger>League</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-3">
-              {filters.leagues.map((league) => (
+              {mainLeagues.map((league) => (
                 <FilterCheckbox
                   key={league}
                   label={league}
                   checked={getSelectedValues('league').includes(league)}
                   onCheckedChange={() => toggleFilter('league', league)}
-                />
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="team">
-          <AccordionTrigger>Team</AccordionTrigger>
-          <AccordionContent>
-            <div className="max-h-64 space-y-3 overflow-y-auto pr-2">
-              {filters.teams.map((team) => (
-                <FilterCheckbox
-                  key={team}
-                  label={team}
-                  checked={getSelectedValues('team').includes(team)}
-                  onCheckedChange={() => toggleFilter('team', team)}
                 />
               ))}
             </div>
