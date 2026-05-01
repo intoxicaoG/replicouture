@@ -63,7 +63,7 @@ export default function ContactPage() {
 
           {/* Email */}
           <a
-            href="mailto:YOUR_EMAIL@gmail.com"
+            href="mailto:replicouture@proton.me"
             className="flex items-center gap-4 rounded-xl border border-border bg-card p-6 transition-all hover:shadow-md hover:border-blue-300 dark:hover:border-blue-800 group"
           >
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 group-hover:bg-blue-200 dark:group-hover:bg-blue-900 transition-colors">
