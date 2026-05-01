@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { MessageCircle } from 'lucide-react'
+import { Instagram } from 'lucide-react'
 import { sql } from '@/lib/db'
 import { type Product, type ProductImage } from '@/lib/types'
 import { Badge } from '@/components/ui/badge'
@@ -39,17 +39,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const displayName = cleanProductName(product.name)
 
-  // WhatsApp message with product info
-  const whatsappMessage = encodeURIComponent(
-    `Hi! I'm interested in this shirt:\n\n` +
-    `${displayName}\n` +
-    `Team: ${product.team}\n` +
-    `Category: ${product.category}\n` +
-    `Season: ${product.season}\n\n` +
-    `Link: https://replicouture.vercel.app/product/${product.id}`
-  )
-  // Replace YOUR_NUMBER with actual WhatsApp number
-  const whatsappUrl = `https://wa.me/YOUR_NUMBER?text=${whatsappMessage}`
+  // Replace YOUR_INSTAGRAM with your actual Instagram username
+  const instagramUrl = `https://ig.me/m/replicouture`
 
   return (
     <div className="min-h-screen bg-background">
@@ -109,9 +100,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
 
             <div className="mt-8 flex flex-col gap-3">
-              <Button asChild size="lg" className="w-full bg-green-600 hover:bg-green-700">
-                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="mr-2 h-5 w-5" />
+              <Button
+                asChild
+                size="lg"
+                className="w-full bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 hover:from-purple-700 hover:via-pink-600 hover:to-orange-500 text-white border-0"
+              >
+                <a href={instagramUrl} target="_blank" rel="noopener noreferrer">
+                  <Instagram className="mr-2 h-5 w-5" />
                   Ask about this shirt
                 </a>
               </Button>
