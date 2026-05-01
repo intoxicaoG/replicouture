@@ -1,11 +1,10 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
 import { sql } from '@/lib/db'
 import { type Product, type ProductImage } from '@/lib/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ImageGallery } from '@/components/product/image-gallery'
+import { BackToCatalog } from '@/components/product/back-to-catalog'
 
 interface ProductPageProps {
   params: Promise<{ id: string }>
@@ -41,13 +40,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <Link
-          href="/catalog"
-          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to catalog
-        </Link>
+        <BackToCatalog />
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Product Images Gallery */}
@@ -120,7 +113,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             <div className="mt-auto pt-8">
               <Button asChild className="w-full" size="lg">
-                <Link href="/catalog">Browse More Shirts</Link>
+                <BackToCatalog variant="button" />
               </Button>
             </div>
           </div>
