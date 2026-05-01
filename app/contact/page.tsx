@@ -19,27 +19,6 @@ export default function ContactPage() {
         {/* Contact Options */}
         <div className="space-y-4">
 
-          {/* WhatsApp */}
-          <a
-            href="https://wa.me/YOUR_NUMBER"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-4 rounded-xl border border-border bg-card p-6 transition-all hover:shadow-md hover:border-green-300 dark:hover:border-green-800 group"
-          >
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 dark:bg-green-950 group-hover:bg-green-200 dark:group-hover:bg-green-900 transition-colors">
-              <MessageCircle className="h-7 w-7 text-green-600" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-foreground text-lg">WhatsApp</h3>
-              <p className="text-sm text-muted-foreground">
-                Fastest way to reach us — usually reply within minutes
-              </p>
-            </div>
-            <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950">
-              Chat now
-            </Button>
-          </a>
-
           {/* Instagram */}
           <a
             href="https://instagram.com/replicouture"
