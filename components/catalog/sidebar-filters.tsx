@@ -12,33 +12,27 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import { type FiltersResponse } from '@/lib/types'
 
-// Only show these major leagues
+// Only show these major leagues (must match normalized names in DB)
 const MAIN_LEAGUES = [
   'Premier League',
   'La Liga',
-  'LaLiga',
   'Serie A',
   'Bundesliga',
   'Ligue 1',
   'Eredivisie',
   'Primeira Liga',
-  'Champions League',
+  'Série A Brazil',
+  'Primera División Argentina',
+  'Liga MX',
   'MLS',
-  'Brazilian Série A',
-  'Brazilian Serie A',
-  'Campeonato Brasileiro Série A',
-  'Argentine Primera División',
-  'Argentina Primera División',
-  'Primera División de Chile',
   'Saudi Pro League',
+  'Süper Lig',
   'Super League Greece',
   'Scottish Premiership',
-  'Belgian Pro League',
-  'Süper Lig',
+  'Jupiler Pro League',
+  'EFL Championship',
+  'J1 League',
   'International',
-  'Copa America',
-  'UEFA European Championship',
-  'UEFA Nations League',
 ]
 
 interface SidebarFiltersProps {
