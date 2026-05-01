@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { MessageCircle } from 'lucide-react'
 import { sql } from '@/lib/db'
 import { type Product, type ProductImage } from '@/lib/types'
 import { Badge } from '@/components/ui/badge'
@@ -20,6 +21,11 @@ async function getProductImages(productId: string): Promise<ProductImage[]> {
   return result as ProductImage[]
 }
 
+// Remove leading numbers and dots/dashes from product name
+function cleanProductName(name: string): string {
+  return name.replace(/^\d+[\.\-\s]*/, '').trim()
+}
+
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params
   const [product, images] = await Promise.all([
@@ -31,11 +37,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound()
   }
 
-  const price = Number(product.price)
-  const originalPrice = product.original_price ? Number(product.original_price) : null
-  const discountPercentage = originalPrice
-    ? Math.round(((originalPrice - price) / originalPrice) * 100)
-    : 0
+  const displayName = cleanProductName(product.name)
+
+  // WhatsApp message with product info
+  const whatsappMessage = encodeURIComponent(
+    `Hi! I'm interested in this shirt:\n\n` +
+    `${displayName}\n` +
+    `Team: ${product.team}\n` +
+    `Category: ${product.category}\n` +
+    `Season: ${product.season}\n\n` +
+    `Link: https://replicouture.vercel.app/product/${product.id}`
+  )
+  // Replace YOUR_NUMBER with actual WhatsApp number
+  const whatsappUrl = `https://wa.me/YOUR_NUMBER?text=${whatsappMessage}`
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,22 +59,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Product Images Gallery */}
           <div className="relative">
-            {/* Badges */}
-            <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-              {product.is_new && (
+            {product.is_new && (
+              <div className="absolute top-4 left-4 z-10">
                 <Badge className="bg-emerald-600 text-white hover:bg-emerald-600 text-sm px-3 py-1">
                   NEW
                 </Badge>
-              )}
-              {product.is_sale && discountPercentage > 0 && (
-                <Badge className="bg-red-600 text-white hover:bg-red-600 text-sm px-3 py-1">
-                  -{discountPercentage}% OFF
-                </Badge>
-              )}
-            </div>
-            
-            <ImageGallery 
-              images={images} 
+              </div>
+            )}
+
+            <ImageGallery
+              images={images}
               productName={product.name}
               fallbackImage={product.image}
             />
@@ -74,21 +82,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
 
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground">
-              {product.name}
+              {displayName}
             </h1>
 
             <p className="mt-2 text-lg text-muted-foreground">{product.team}</p>
-
-            <div className="mt-6 flex items-baseline gap-3">
-              <span className="text-4xl font-bold text-foreground">
-                {price.toFixed(2)}€
-              </span>
-              {product.is_sale && originalPrice && (
-                <span className="text-xl text-muted-foreground line-through">
-                  {originalPrice.toFixed(2)}€
-                </span>
-              )}
-            </div>
 
             <div className="mt-8 space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -111,10 +108,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
             </div>
 
-            <div className="mt-auto pt-8">
-              <Button asChild className="w-full" size="lg">
-                <BackToCatalog variant="button" />
+            <div className="mt-8 flex flex-col gap-3">
+              <Button asChild size="lg" className="w-full bg-green-600 hover:bg-green-700">
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  <MessageCircle className="mr-2 h-5 w-5" />
+                  Ask about this shirt
+                </a>
               </Button>
+
+              <BackToCatalog variant="button" />
             </div>
           </div>
         </div>

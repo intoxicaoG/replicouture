@@ -19,6 +19,18 @@ export function Header() {
           >
             Catalog
           </Link>
+          <Link
+            href="/prices"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Prices
+          </Link>
+          <Link
+            href="/contact"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Contact
+          </Link>
         </nav>
       </div>
     </header>

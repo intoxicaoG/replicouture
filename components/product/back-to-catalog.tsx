@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface BackToCatalogProps {
   variant?: 'link' | 'button'
@@ -11,7 +12,6 @@ export function BackToCatalog({ variant = 'link' }: BackToCatalogProps) {
   const router = useRouter()
 
   const handleBack = () => {
-    // Use browser history to go back to the exact catalog page + scroll position
     if (typeof window !== 'undefined' && window.history.length > 1) {
       router.back()
     } else {
@@ -21,9 +21,15 @@ export function BackToCatalog({ variant = 'link' }: BackToCatalogProps) {
 
   if (variant === 'button') {
     return (
-      <button onClick={handleBack} className="w-full">
+      <Button
+        variant="outline"
+        size="lg"
+        className="w-full"
+        onClick={handleBack}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
         Browse More Shirts
-      </button>
+      </Button>
     )
   }
 
