@@ -1,57 +1,53 @@
-import { sql } from '@/lib/db'
+import { sql, buildProductQuery } from '@/lib/db'
 import { type Product, type ProductsResponse } from '@/lib/types'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    
+
     const teams = searchParams.getAll('team')
     const leagues = searchParams.getAll('league')
     const categories = searchParams.getAll('category')
     const seasons = searchParams.getAll('season')
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '12')
+    const search = searchParams.get('q')?.trim() || ''
     const sort = searchParams.get('sort') || 'newest'
-    
-    // Fetch all products using tagged template literal
-    const allProducts = await sql`SELECT * FROM products ORDER BY created_at DESC` as Product[]
-    
-    // Filter in memory for dynamic filters
-    let filteredProducts = allProducts
-    
-    if (teams.length > 0) {
-      filteredProducts = filteredProducts.filter(p => teams.includes(p.team))
-    }
-    if (leagues.length > 0) {
-      filteredProducts = filteredProducts.filter(p => leagues.includes(p.league))
-    }
-    if (categories.length > 0) {
-      filteredProducts = filteredProducts.filter(p => categories.includes(p.category))
-    }
-    if (seasons.length > 0) {
-      filteredProducts = filteredProducts.filter(p => seasons.includes(p.season))
-    }
-    
-    // Sort
-    if (sort === 'price_asc') {
-      filteredProducts.sort((a, b) => a.price - b.price)
-    } else if (sort === 'price_desc') {
-      filteredProducts.sort((a, b) => b.price - a.price)
-    }
-    
-    const total = filteredProducts.length
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '24')))
     const offset = (page - 1) * limit
-    const paginatedProducts = filteredProducts.slice(offset, offset + limit)
-    
+
+    const filterOptions = {
+      teams: teams.length > 0 ? teams : undefined,
+      leagues: leagues.length > 0 ? leagues : undefined,
+      categories: categories.length > 0 ? categories : undefined,
+      seasons: seasons.length > 0 ? seasons : undefined,
+      search: search || undefined,
+      sort,
+    }
+
+    // Run count + data in parallel, both in SQL
+    const countQuery = buildProductQuery({ ...filterOptions, countOnly: true })
+    const dataQuery = buildProductQuery({ ...filterOptions, limit, offset })
+
+    const [countResult, dataResult] = await Promise.all([
+      sql(countQuery.query, countQuery.params),
+      sql(dataQuery.query, dataQuery.params),
+    ])
+
+    const total = (countResult[0] as { total: number }).total
+
     const response: ProductsResponse = {
-      products: paginatedProducts,
+      products: dataResult as Product[],
       total,
       page,
-      totalPages: Math.ceil(total / limit)
+      totalPages: Math.ceil(total / limit),
     }
-    
-    return NextResponse.json(response)
+
+    return NextResponse.json(response, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    })
   } catch (error) {
     console.error('Error fetching products:', error)
     return NextResponse.json(

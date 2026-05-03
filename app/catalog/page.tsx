@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { sql } from '@/lib/db'
+import { sql, buildProductQuery } from '@/lib/db'
 import { type Product, type FiltersResponse } from '@/lib/types'
 import { ProductGrid } from '@/components/catalog/product-grid'
 import { SidebarFilters } from '@/components/catalog/sidebar-filters'
@@ -10,6 +10,9 @@ import { SearchInput } from '@/components/catalog/search-input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+
+// Revalidate every 5 minutes instead of every request
+export const revalidate = 300
 
 const PRODUCTS_PER_PAGE = 24
 
@@ -41,6 +44,11 @@ async function getFilters(): Promise<FiltersResponse> {
   }
 }
 
+function toArray(val?: string | string[]): string[] {
+  if (!val) return []
+  return Array.isArray(val) ? val : [val]
+}
+
 async function getProducts(searchParams: {
   team?: string | string[]
   league?: string | string[]
@@ -50,70 +58,36 @@ async function getProducts(searchParams: {
   sort?: string
   q?: string
 }): Promise<{ products: Product[]; total: number; page: number; totalPages: number }> {
-  const teams = Array.isArray(searchParams.team)
-    ? searchParams.team
-    : searchParams.team
-      ? [searchParams.team]
-      : []
-  const leagues = Array.isArray(searchParams.league)
-    ? searchParams.league
-    : searchParams.league
-      ? [searchParams.league]
-      : []
-  const categories = Array.isArray(searchParams.category)
-    ? searchParams.category
-    : searchParams.category
-      ? [searchParams.category]
-      : []
-  const seasons = Array.isArray(searchParams.season)
-    ? searchParams.season
-    : searchParams.season
-      ? [searchParams.season]
-      : []
-
-  const searchQuery = searchParams.q?.toLowerCase().trim() || ''
-  const currentPage = Math.max(1, parseInt(searchParams.page || '1', 10))
-
-  const allProducts = await sql`SELECT * FROM products ORDER BY id DESC` as Product[]
-  
-  let filteredProducts = allProducts
-  
-  if (searchQuery) {
-    filteredProducts = filteredProducts.filter(p => 
-      p.name.toLowerCase().includes(searchQuery) ||
-      p.team.toLowerCase().includes(searchQuery) ||
-      p.league.toLowerCase().includes(searchQuery) ||
-      p.category.toLowerCase().includes(searchQuery)
-    )
-  }
-  
-  if (teams.length > 0) {
-    filteredProducts = filteredProducts.filter(p => teams.includes(p.team))
-  }
-  if (leagues.length > 0) {
-    filteredProducts = filteredProducts.filter(p => leagues.includes(p.league))
-  }
-  if (categories.length > 0) {
-    filteredProducts = filteredProducts.filter(p => categories.includes(p.category))
-  }
-  if (seasons.length > 0) {
-    filteredProducts = filteredProducts.filter(p => seasons.includes(p.season))
-  }
-
+  const teams = toArray(searchParams.team)
+  const leagues = toArray(searchParams.league)
+  const categories = toArray(searchParams.category)
+  const seasons = toArray(searchParams.season)
+  const search = searchParams.q?.trim() || ''
   const sort = searchParams.sort || 'newest'
-  if (sort === 'price_asc') {
-    filteredProducts.sort((a, b) => a.price - b.price)
-  } else if (sort === 'price_desc') {
-    filteredProducts.sort((a, b) => b.price - a.price)
-  }
+  const currentPage = Math.max(1, parseInt(searchParams.page || '1', 10))
+  const offset = (currentPage - 1) * PRODUCTS_PER_PAGE
 
-  const total = filteredProducts.length
+  const filterOptions = { teams, leagues, categories, seasons, search, sort }
+
+  // Run count + data queries in parallel — both in SQL, not JS
+  const countQuery = buildProductQuery({ ...filterOptions, countOnly: true })
+  const dataQuery = buildProductQuery({ ...filterOptions, limit: PRODUCTS_PER_PAGE, offset })
+
+  const [countResult, dataResult] = await Promise.all([
+    sql(countQuery.query, countQuery.params),
+    sql(dataQuery.query, dataQuery.params),
+  ])
+
+  const total = (countResult[0] as { total: number }).total
   const totalPages = Math.max(1, Math.ceil(total / PRODUCTS_PER_PAGE))
   const safePage = Math.min(currentPage, totalPages)
-  const start = (safePage - 1) * PRODUCTS_PER_PAGE
-  const paginatedProducts = filteredProducts.slice(start, start + PRODUCTS_PER_PAGE)
 
-  return { products: paginatedProducts, total, page: safePage, totalPages }
+  return {
+    products: dataResult as Product[],
+    total,
+    page: safePage,
+    totalPages,
+  }
 }
 
 function buildPageUrl(searchParams: URLSearchParams, page: number): string {
@@ -138,19 +112,18 @@ function Pagination({
 }) {
   if (totalPages <= 1) return null
 
-  // Build page numbers to show
   const pages: (number | '...')[] = []
-  
+
   if (totalPages <= 7) {
     for (let i = 1; i <= totalPages; i++) pages.push(i)
   } else {
     pages.push(1)
     if (currentPage > 3) pages.push('...')
-    
+
     const start = Math.max(2, currentPage - 1)
     const end = Math.min(totalPages - 1, currentPage + 1)
     for (let i = start; i <= end; i++) pages.push(i)
-    
+
     if (currentPage < totalPages - 2) pages.push('...')
     pages.push(totalPages)
   }
