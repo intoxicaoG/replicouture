@@ -1,4 +1,4 @@
-import { MessageCircle, Instagram, Mail } from 'lucide-react'
+import { Instagram, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default function ContactPage() {
@@ -6,7 +6,6 @@ export default function ContactPage() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
 
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight text-foreground">
             Contact Us
@@ -16,37 +15,35 @@ export default function ContactPage() {
           </p>
         </div>
 
-        {/* Contact Options */}
-        <div className="space-y-4">
-
+        <div className="space-y-3">
           {/* Instagram */}
           <a
-            href="https://instagram.com/replicouture"
+            href="https://ig.me/m/YOUR_INSTAGRAM"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-4 rounded-xl border border-border bg-card p-6 transition-all hover:shadow-md hover:border-pink-300 dark:hover:border-pink-800 group"
+            className="flex items-center gap-4 rounded-xl border border-border/50 bg-card p-6 transition-all hover:border-pink-500/30 hover:shadow-[0_0_30px_-5px_rgba(236,72,153,0.15)] group"
           >
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-950 group-hover:bg-pink-200 dark:group-hover:bg-pink-900 transition-colors">
-              <Instagram className="h-7 w-7 text-pink-600" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600/20 via-pink-500/20 to-orange-400/20 group-hover:from-purple-600/30 group-hover:via-pink-500/30 group-hover:to-orange-400/30 transition-colors">
+              <Instagram className="h-7 w-7 text-pink-400" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-foreground text-lg">Instagram</h3>
+              <h3 className="font-semibold text-foreground text-lg">Instagram DM</h3>
               <p className="text-sm text-muted-foreground">
-                Follow us for new arrivals and send us a DM
+                Fastest way to reach us — usually reply within minutes
               </p>
             </div>
-            <Button variant="outline" className="border-pink-300 text-pink-700 hover:bg-pink-50 dark:border-pink-800 dark:text-pink-400 dark:hover:bg-pink-950">
-              Follow
+            <Button variant="outline" size="sm" className="border-pink-500/30 text-pink-400 hover:bg-pink-500/10 hover:text-pink-300">
+              Message
             </Button>
           </a>
 
           {/* Email */}
           <a
-            href="mailto:replicouture@proton.me"
-            className="flex items-center gap-4 rounded-xl border border-border bg-card p-6 transition-all hover:shadow-md hover:border-blue-300 dark:hover:border-blue-800 group"
+            href="mailto:YOUR_EMAIL@gmail.com"
+            className="flex items-center gap-4 rounded-xl border border-border/50 bg-card p-6 transition-all hover:border-blue-500/30 hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.15)] group"
           >
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950 group-hover:bg-blue-200 dark:group-hover:bg-blue-900 transition-colors">
-              <Mail className="h-7 w-7 text-blue-600" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+              <Mail className="h-7 w-7 text-blue-400" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-foreground text-lg">Email</h3>
@@ -54,30 +51,29 @@ export default function ContactPage() {
                 For bulk orders or business inquiries
               </p>
             </div>
-            <Button variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950">
-              Send email
+            <Button variant="outline" size="sm" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:text-blue-300">
+              Send
             </Button>
           </a>
-
         </div>
 
-        {/* FAQ-style note */}
-        <div className="mt-12 rounded-xl border border-border bg-card p-6">
-          <h2 className="font-semibold text-foreground mb-3">How to order</h2>
-          <ol className="space-y-2 text-sm text-muted-foreground">
-            <li className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">1</span>
-              Browse the catalog and find the shirt you want
-            </li>
-            <li className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">2</span>
-              Click &quot;Ask about this shirt&quot; or contact us directly
-            </li>
-            <li className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">3</span>
-              Tell us your size, name and number — we&apos;ll handle the rest
-            </li>
-          </ol>
+        {/* How to order */}
+        <div className="mt-12 rounded-xl border border-border/50 bg-card p-8">
+          <h2 className="font-semibold text-foreground mb-4">How to order</h2>
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">1</span>
+              <p className="text-sm text-muted-foreground pt-0.5">Browse the catalog and find the shirt you want</p>
+            </div>
+            <div className="flex gap-4">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">2</span>
+              <p className="text-sm text-muted-foreground pt-0.5">Click &quot;Ask about this shirt&quot; or contact us directly</p>
+            </div>
+            <div className="flex gap-4">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">3</span>
+              <p className="text-sm text-muted-foreground pt-0.5">Tell us your size, name and number — we&apos;ll handle the rest</p>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -87,5 +83,5 @@ export default function ContactPage() {
 
 export const metadata = {
   title: 'Contact - Replicouture',
-  description: 'Get in touch with Replicouture to order your football shirt via WhatsApp, Instagram or email.',
+  description: 'Get in touch with Replicouture to order your football shirt.',
 }
