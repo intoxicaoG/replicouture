@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Security headers
   async headers() {
     return [
       {
@@ -26,13 +25,23 @@ const nextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https://*.r2.dev https://*.cloudflare.com",
+              "font-src 'self'",
+              "connect-src 'self' https://va.vercel-scripts.com",
+              "frame-ancestors 'none'",
+            ].join("; "),
+          },
         ],
       },
     ];
   },
 
-  // Image optimization - restrict to your R2 domain only
-  // Replace the hostname with your actual R2 public URL
   images: {
     remotePatterns: [
       {
@@ -45,6 +54,6 @@ const nextConfig = {
       },
     ],
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
