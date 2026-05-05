@@ -18,7 +18,7 @@ export default function ContactPage() {
         <div className="space-y-3">
           {/* Instagram */}
           <a
-            href="https://ig.me/m/YOUR_INSTAGRAM"
+            href="https://ig.me/m/replicouture"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-4 rounded-xl border border-border/50 bg-card p-6 transition-all hover:border-pink-500/30 hover:shadow-[0_0_30px_-5px_rgba(236,72,153,0.15)] group"

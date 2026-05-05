@@ -40,13 +40,13 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-3">Follow Us</h3>
             <a
-              href="https://instagram.com/YOUR_INSTAGRAM"
+              href="https://instagram.com/replicouture"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               <Instagram className="h-4 w-4" />
-              @YOUR_INSTAGRAM
+              @replicouture
             </a>
           </div>
         </div>
