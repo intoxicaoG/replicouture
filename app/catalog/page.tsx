@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { sql, buildProductQuery } from '@/lib/db'
+import { sql, query, buildProductQuery } from '@/lib/db'
 import { type Product, type FiltersResponse } from '@/lib/types'
 import { ProductGrid } from '@/components/catalog/product-grid'
 import { SidebarFilters } from '@/components/catalog/sidebar-filters'
@@ -11,7 +11,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-// Revalidate every 5 minutes instead of every request
 export const revalidate = 300
 
 const PRODUCTS_PER_PAGE = 24
@@ -67,15 +66,21 @@ async function getProducts(searchParams: {
   const currentPage = Math.max(1, parseInt(searchParams.page || '1', 10))
   const offset = (currentPage - 1) * PRODUCTS_PER_PAGE
 
-  const filterOptions = { teams, leagues, categories, seasons, search, sort }
+  const filterOptions = {
+    teams: teams.length > 0 ? teams : undefined,
+    leagues: leagues.length > 0 ? leagues : undefined,
+    categories: categories.length > 0 ? categories : undefined,
+    seasons: seasons.length > 0 ? seasons : undefined,
+    search: search || undefined,
+    sort,
+  }
 
-  // Run count + data queries in parallel — both in SQL, not JS
-  const countQuery = buildProductQuery({ ...filterOptions, countOnly: true })
-  const dataQuery = buildProductQuery({ ...filterOptions, limit: PRODUCTS_PER_PAGE, offset })
+  const countQ = buildProductQuery({ ...filterOptions, countOnly: true })
+  const dataQ = buildProductQuery({ ...filterOptions, limit: PRODUCTS_PER_PAGE, offset })
 
   const [countResult, dataResult] = await Promise.all([
-    sql(countQuery.query, countQuery.params),
-    sql(dataQuery.query, dataQuery.params),
+    query(countQ.text, countQ.params),
+    query(dataQ.text, dataQ.params),
   ])
 
   const total = (countResult[0] as { total: number }).total
@@ -186,7 +191,6 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
     getProducts(resolvedParams),
   ])
 
-  // Build current search params for pagination links
   const currentSearchParams = new URLSearchParams()
   const paramKeys = ['team', 'league', 'category', 'season', 'sort', 'q'] as const
   for (const key of paramKeys) {
@@ -220,14 +224,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         </div>
 
         <div className="flex flex-col gap-6 lg:flex-row">
-          {/* Sidebar - Desktop */}
           <aside className="hidden w-64 shrink-0 lg:block">
             <Suspense fallback={<FiltersSkeleton />}>
               <SidebarFilters filters={filters} />
             </Suspense>
           </aside>
 
-          {/* Main Content */}
           <main className="flex-1">
             <div className="mb-4 flex items-center justify-between gap-4">
               <Suspense fallback={null}>

@@ -1,4 +1,4 @@
-import { sql, buildProductQuery } from '@/lib/db'
+import { query, buildProductQuery } from '@/lib/db'
 import { type Product, type ProductsResponse } from '@/lib/types'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -25,13 +25,12 @@ export async function GET(request: NextRequest) {
       sort,
     }
 
-    // Run count + data in parallel, both in SQL
-    const countQuery = buildProductQuery({ ...filterOptions, countOnly: true })
-    const dataQuery = buildProductQuery({ ...filterOptions, limit, offset })
+    const countQ = buildProductQuery({ ...filterOptions, countOnly: true })
+    const dataQ = buildProductQuery({ ...filterOptions, limit, offset })
 
     const [countResult, dataResult] = await Promise.all([
-      sql(countQuery.query, countQuery.params),
-      sql(dataQuery.query, dataQuery.params),
+      query(countQ.text, countQ.params),
+      query(dataQ.text, dataQ.params),
     ])
 
     const total = (countResult[0] as { total: number }).total

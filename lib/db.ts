@@ -7,6 +7,18 @@ if (!process.env.DATABASE_URL) {
 export const sql = neon(process.env.DATABASE_URL)
 
 /**
+ * Execute a dynamic parameterized query using neon's fullResults mode.
+ * neon() returns a function that supports both tagged template literals
+ * AND regular function calls as sql(query, params).
+ */
+export async function query(queryString: string, params: (string | number)[] = []) {
+  // neon() supports sql(queryString, params) but TypeScript types
+  // only expose the tagged template signature. Cast to any to use
+  // the parameterized query mode which IS supported at runtime.
+  return await (sql as any)(queryString, params)
+}
+
+/**
  * Build a parameterized query with dynamic WHERE clauses.
  * All values are passed as parameters ($1, $2...) to prevent SQL injection.
  */
@@ -64,7 +76,7 @@ export function buildProductQuery(options: {
 
   if (options.countOnly) {
     return {
-      query: `SELECT COUNT(*)::int as total FROM products ${whereClause}`,
+      text: `SELECT COUNT(*)::int as total FROM products ${whereClause}`,
       params,
     }
   }
@@ -77,7 +89,7 @@ export function buildProductQuery(options: {
   const offset = options.offset || 0
 
   return {
-    query: `SELECT id, name, team, league, category, season, price, image, is_new FROM products ${whereClause} ${orderBy} LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
+    text: `SELECT id, name, team, league, category, season, price, image, is_new FROM products ${whereClause} ${orderBy} LIMIT $${paramIndex++} OFFSET $${paramIndex++}`,
     params: [...params, limit, offset],
   }
 }
