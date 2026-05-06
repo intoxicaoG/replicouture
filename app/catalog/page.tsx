@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { sql, query, buildProductQuery } from '@/lib/db'
+import { sql } from '@/lib/db'
 import { type Product, type FiltersResponse } from '@/lib/types'
 import { ProductGrid } from '@/components/catalog/product-grid'
 import { SidebarFilters } from '@/components/catalog/sidebar-filters'
@@ -61,38 +61,54 @@ async function getProducts(searchParams: {
   const leagues = toArray(searchParams.league)
   const categories = toArray(searchParams.category)
   const seasons = toArray(searchParams.season)
-  const search = searchParams.q?.trim() || ''
-  const sort = searchParams.sort || 'newest'
+  const searchQuery = searchParams.q?.toLowerCase().trim() || ''
   const currentPage = Math.max(1, parseInt(searchParams.page || '1', 10))
-  const offset = (currentPage - 1) * PRODUCTS_PER_PAGE
 
-  const filterOptions = {
-    teams: teams.length > 0 ? teams : undefined,
-    leagues: leagues.length > 0 ? leagues : undefined,
-    categories: categories.length > 0 ? categories : undefined,
-    seasons: seasons.length > 0 ? seasons : undefined,
-    search: search || undefined,
-    sort,
+  // Use tagged template for the base query — safe from SQL injection
+  const allProducts = await sql`
+    SELECT id, name, team, league, category, season, price, image, is_new 
+    FROM products 
+    ORDER BY id DESC
+  ` as Product[]
+
+  let filtered = allProducts
+
+  if (searchQuery) {
+    filtered = filtered.filter(p =>
+      p.name.toLowerCase().includes(searchQuery) ||
+      p.team.toLowerCase().includes(searchQuery) ||
+      p.league.toLowerCase().includes(searchQuery) ||
+      p.category.toLowerCase().includes(searchQuery)
+    )
   }
 
-  const countQ = buildProductQuery({ ...filterOptions, countOnly: true })
-  const dataQ = buildProductQuery({ ...filterOptions, limit: PRODUCTS_PER_PAGE, offset })
+  if (teams.length > 0) {
+    filtered = filtered.filter(p => teams.includes(p.team))
+  }
+  if (leagues.length > 0) {
+    filtered = filtered.filter(p => leagues.includes(p.league))
+  }
+  if (categories.length > 0) {
+    filtered = filtered.filter(p => categories.includes(p.category))
+  }
+  if (seasons.length > 0) {
+    filtered = filtered.filter(p => seasons.includes(p.season))
+  }
 
-  const [countResult, dataResult] = await Promise.all([
-    query(countQ.text, countQ.params),
-    query(dataQ.text, dataQ.params),
-  ])
+  const sort = searchParams.sort || 'newest'
+  if (sort === 'price_asc') {
+    filtered.sort((a, b) => a.price - b.price)
+  } else if (sort === 'price_desc') {
+    filtered.sort((a, b) => b.price - a.price)
+  }
 
-  const total = (countResult[0] as { total: number }).total
+  const total = filtered.length
   const totalPages = Math.max(1, Math.ceil(total / PRODUCTS_PER_PAGE))
   const safePage = Math.min(currentPage, totalPages)
+  const start = (safePage - 1) * PRODUCTS_PER_PAGE
+  const paginatedProducts = filtered.slice(start, start + PRODUCTS_PER_PAGE)
 
-  return {
-    products: dataResult as Product[],
-    total,
-    page: safePage,
-    totalPages,
-  }
+  return { products: paginatedProducts, total, page: safePage, totalPages }
 }
 
 function buildPageUrl(searchParams: URLSearchParams, page: number): string {
