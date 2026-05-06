@@ -66,7 +66,7 @@ async function getProducts(searchParams: {
 
   // Use tagged template for the base query — safe from SQL injection
   const allProducts = await sql`
-    SELECT id, name, team, league, category, season, price, image, is_new 
+    SELECT id, name, team, league, category, season, price, image 
     FROM products 
     ORDER BY id DESC
   ` as Product[]
