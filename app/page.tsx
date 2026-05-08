@@ -5,6 +5,13 @@ import { sql } from '@/lib/db'
 import { type Product } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 
+// ┌─────────────────────────────────────────────────────────────┐
+// │  PROMO BADGE — importa desde el componente dedicado         │
+// │  Para editar o desactivar: toca solo PromoBadge.tsx         │
+// │  Para eliminar: borra PromoBadge.tsx y quita <PromoBadge /> │
+// └─────────────────────────────────────────────────────────────┘
+import { PromoBadge } from '@/components/PromoBadge'
+
 // 🔹 Change this ID to feature a different shirt
 const FEATURED_PRODUCT_ID = 1527
 
@@ -118,6 +125,10 @@ export default async function Home() {
                     </span>
                   </div>
                 </div>
+
+                {/* ── PROMO BADGE ── quita esta línea para eliminar la promo */}
+                <PromoBadge />
+
               </div>
             </div>
           </div>

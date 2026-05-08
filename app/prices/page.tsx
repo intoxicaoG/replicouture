@@ -4,22 +4,22 @@ import Image from 'next/image'
 const pricingItems = [
   {
     name: 'Fan Version',
-    price: '20€',
+    price: '25€',
     description: 'Standard fan replica shirt',
   },
   {
     name: 'Player Version',
-    price: '23€',
+    price: '27€',
     description: 'Slim fit, match-day fabric',
   },
   {
     name: 'Retro',
-    price: '25€',
+    price: '30€',
     description: 'Classic vintage shirts',
   },
   {
     name: 'Long Sleeve',
-    price: '23€',
+    price: '25€',
     description: 'Full sleeve version',
   },
 ]
