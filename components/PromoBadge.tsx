@@ -13,7 +13,7 @@ export const PROMO_CONFIG = {
 
   headline: "2ª unidad",           // texto superior
   discount: "−50%",                 // número grande central
-  subtext: "en tu próximo pedido",  // texto inferior
+  subtext: "",  // texto inferior
 
   // Colores del degradado radial (acepta cualquier valor CSS)
   bgFrom: "#f59e0b",               // ámbar — centro del círculo
