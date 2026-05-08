@@ -6,7 +6,7 @@ import { type Product } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 
 // 🔹 Change this ID to feature a different shirt
-const FEATURED_PRODUCT_ID = 1146
+const FEATURED_PRODUCT_ID = 1527
 
 async function getFeaturedProduct(): Promise<Product | null> {
   const result = await sql`SELECT * FROM products WHERE id = ${FEATURED_PRODUCT_ID} LIMIT 1`
