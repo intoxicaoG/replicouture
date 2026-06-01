@@ -11,9 +11,9 @@
 export const PROMO_CONFIG = {
   enabled: true,                    // false = oculta el badge sin tocar nada más
 
-  headline: "2ª unidad",           // texto superior
-  discount: "−50%",                 // número grande central
-  subtext: "",  // texto inferior
+  headline: "DESCUENTOS Y SORPRESAS",           // texto superior
+  discount: "",                 // número grande central
+  subtext: "MUY PRONTO",  // texto inferior
 
   // Colores del degradado radial (acepta cualquier valor CSS)
   bgFrom: "#f59e0b",               // ámbar — centro del círculo
